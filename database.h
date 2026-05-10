@@ -2,20 +2,26 @@
 #define DATABASE_H
 
 #include "Models.h"
-#include <fstream> // Tambahkan untuk operasi file
+#include <fstream> // tambahkan untuk operasi file
 
 class Database {
 private:
+    // root adalah simpul akar atau titik awal dari binary search tree (bst)
     Movie* root;
+    
+    // ukuran tabel hash yang ditentukan secara statis
     static const int HASH_SIZE = 10;
+    
+    // array dari pointer untuk menyimpan hash table dari genre
     GenreNode* genreTable[HASH_SIZE];
 
+    // deklarasi fungsi internal untuk algoritma data structure
     int hashFunction(std::string key);
     Movie* insertBST(Movie* node, Movie* newMovie);
     Movie* searchBST(Movie* node, std::string name);
     void getMoviesFiltered(Movie* node, bool isSeries, MovieList& result);
     
-    // Helper untuk menyimpan data secara rekursif (In-order Traversal)
+    // helper untuk menyimpan data secara rekursif (in-order traversal)
     void saveRecursive(Movie* node, std::ofstream& file);
 
 public:
@@ -29,7 +35,7 @@ public:
     Movie* searchMovie(std::string name);
     MovieList getAll(bool isSeries);
 
-    // Fungsi Database Fisik
+    // fungsi database fisik
     void saveToFile();
     void loadFromFile();
 };
