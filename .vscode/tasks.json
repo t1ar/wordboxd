@@ -7,7 +7,7 @@
             "args": [
                 "-fdiagnostics-color=always",
                 "-g",
-                "main.cpp",
+                "056_t1ar_prak5.cpp",
                 "database.cpp",
                 "-o",
                 "${workspaceFolder}\\main.exe",
