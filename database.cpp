@@ -72,13 +72,20 @@ void Database::saveRecursive(Movie* node, std::ofstream& file) {
     
     saveRecursive(node->left, file);
     
-    // format: nama|genre1,genre2|ep|season|studio|rating|totalrate
+    // format data: nama|genre1,genre2|ep|season|studio|rating|totalrate
     file << node->nama << "|";
     for (int i = 0; i < node->genre_names.count; i++) {
         file << node->genre_names.get(i) << (i < node->genre_names.count - 1 ? "," : "");
     }
     file << "|" << node->ep << "|" << node->season << "|" << node->studio << "|" 
-         << node->rating << "|" << node->total_rating << "\n";
+         << node->rating << "|" << node->total_rating;
+         
+    // tambahan: tambahkan kolom pembatas '|' baru untuk menyimpan film terkait
+    file << "|";
+    for (int i = 0; i < node->related_movies.count; i++) {
+        file << node->related_movies.get(i)->nama << (i < node->related_movies.count - 1 ? "," : "");
+    }
+    file << "\n";
     
     saveRecursive(node->right, file);
 }
@@ -112,10 +119,11 @@ void Database::loadFromFile() {
     if (!file.is_open()) return;
 
     std::string line;
+    
+    // === pass 1: bangun semua node film terlebih dahulu ke dalam tree ===
     while (std::getline(file, line)) {
         if (line.empty()) continue;
         
-        // pecah string per baris berdasarkan pipa '|'
         StringList parts = splitManual(line, '|');
         if (parts.count < 7) continue;
 
@@ -127,15 +135,57 @@ void Database::loadFromFile() {
         float rat = std::stof(parts.get(5));
         int tRat = std::stoi(parts.get(6));
 
-        // tambahkan ke sistem (tanpa relasi dulu agar tidak error saat diload karena objek graf mungkin belum ada di bst)
+        // selalu kirim relasi kosong di pass 1 ini agar aman
         StringList emptyRelated;
         addMovie(nama, genres, ep, season, emptyRelated, studio, true);
         
-        // restore data rating asli yang sudah dihitung sebelumnya
         Movie* m = searchMovie(nama);
         if (m) {
             m->rating = rat;
             m->total_rating = tRat;
+        }
+    }
+    
+    // === pass 2: setelah semua node jadi, baca file lagi untuk menyambungkan graf-nya ===
+    // reset posisi pembacaan file kembali ke baris paling atas
+    file.clear();
+    file.seekg(0, std::ios::beg);
+    
+    while (std::getline(file, line)) {
+        if (line.empty()) continue;
+        
+        StringList parts = splitManual(line, '|');
+        // jika ada minimal 8 kolom, berarti film ini punya relasi
+        if (parts.count >= 8) {
+            std::string namaUtama = parts.get(0);
+            Movie* mUtama = searchMovie(namaUtama);
+            if (mUtama == nullptr) continue; // untuk keamanan
+            
+            // pecah daftar film terkait di kolom ke-8
+            StringList relatedNames = splitManual(parts.get(7), ',');
+            StringNode* temp = relatedNames.head;
+            
+            while (temp != nullptr) {
+                if (!temp->data.empty()) {
+                    Movie* mTerkait = searchMovie(temp->data);
+                    if (mTerkait != nullptr) {
+                        // cek manual apakah relasi sudah ada untuk mencegah duplikasi jabat tangan
+                        bool sudahAda = false;
+                        for (int i = 0; i < mUtama->related_movies.count; i++) {
+                            if (mUtama->related_movies.get(i)->nama == mTerkait->nama) {
+                                sudahAda = true;
+                                break;
+                            }
+                        }
+                        
+                        // jika belum berteman, tambahkan alamat memori temannya ke buku kontak
+                        if (!sudahAda) {
+                            mUtama->related_movies.add(mTerkait);
+                        }
+                    }
+                }
+                temp = temp->next;
+            }
         }
     }
     file.close();

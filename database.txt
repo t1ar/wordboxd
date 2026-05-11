@@ -1,0 +1,9 @@
+Final Fantasy VII: Advent Children|Action,Animated|0|0|Square Enix|9.2|15|Kingsglaive: Final Fantasy XV
+Kingsglaive: Final Fantasy XV|Action,Animated,Drama|0|0|Square Pictures|7.5|20|Final Fantasy VII: Advent Children
+Sonic Prime|Action,Fiction|23|3|Netflix|8.5|10|Sonic the Hedgehog 2
+Sonic the Hedgehog 2|Action,Comedy|0|0|Paramount|7.0|50|Sonic Prime
+Inception|Fiction,Action|0|0|Warner Bros|8.8|100|The Matrix,Interstellar
+The Matrix|Fiction,Action|0|0|Warner Bros|8.7|120|Inception
+Interstellar|Fiction,Drama|0|0|Paramount|8.6|110|Inception
+Kirby: Right Back at Ya!|Comedy,Animated|100|1|Nintendo|8.0|12|
+God of War: Raising Kratos|Drama,Action|0|0|Santa Monica Studio|8.8|30|
